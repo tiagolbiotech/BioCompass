@@ -61,7 +61,7 @@ $(ClustersDatabase)/MIBiG:
 
 $(ClustersDatabase)/CUSTOMDB: $(ClustersDatabase)/MIBiG
 	if [ -d $(CUSTOMDB) ]; then \
-	cp $(CUSTOMDB)/*.gbk $(ClustersDatabase); \
+	cp $(CUSTOMDB)/**/*.gbk $(ClustersDatabase); \
 	fi
 
 $(ClustersDatabase): $(ClustersDatabase)/CUSTOMDB

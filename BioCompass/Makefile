@@ -75,8 +75,7 @@ $(TABLEDIR)/$(REFNAME)_db: $(ClustersDatabase)
 	export PATH="$(PATH):$(MULTIGENEBLASTDIR)"; \
 	cd `dirname $@`; \
 	python $(MAKEDB) `basename $@` \
-		`find $(ClustersDatabase) -name '*gbk' | awk '{print $$0}' ORS=' '`
-
+		$(ClustersDatabase)`ls -R $(ClustersDatabase) | awk -v ORS=' '  '{ print $1 }' | sed 's/,$/\n/'`
 
 $(MBGDIR)/$(REFNAME)_001_1_A: $(TABLE2_1) $(TABLEDIR)/$(REFNAME)_db
 	mkdir -p $(MBGDIR)

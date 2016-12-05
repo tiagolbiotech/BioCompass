@@ -45,6 +45,9 @@ ALL:
 	$(MAKE) step_G
 	# $(MAKE) step_H
 
+PART1:
+	$(MAKE) $(ClustersDatabase)
+
 $(TABLEDIR)/$(REFNAME)_%.gbk:
 	mkdir -p `dirname $@`
 	python table_1_gen.py `ls $(INPUTDIR)/$(REFNAME)/*cluster$*.gbk` $(TABLEDIR)/$(REFNAME)_$*
@@ -61,7 +64,7 @@ $(ClustersDatabase)/MIBiG:
 
 $(ClustersDatabase)/CUSTOMDB: $(ClustersDatabase)/MIBiG
 	if [ -d $(CUSTOMDB) ]; then \
-	cp $(CUSTOMDB)/**/*.gbk $(ClustersDatabase); \
+	cp $(CUSTOMDB)/*.gbk $(ClustersDatabase); \
 	fi
 
 $(ClustersDatabase): $(ClustersDatabase)/CUSTOMDB
@@ -80,7 +83,7 @@ $(TABLEDIR)/$(REFNAME)_db: $(ClustersDatabase)
 $(MBGDIR)/$(REFNAME)_001_1_A: $(TABLE2_1) $(TABLEDIR)/$(REFNAME)_db
 	mkdir -p $(MBGDIR)
 
-	cp $(TABLEDIR)/$(REFNAME)_db* $(MULTIGENEBLASTDIR)/
+	# cp $(TABLEDIR)/$(REFNAME)_db* $(MULTIGENEBLASTDIR)/
 
 	cd $(MULTIGENEBLASTDIR); \
 	num=`echo $(GBK_INPUT_LIST) | wc -w`; \
@@ -97,7 +100,7 @@ $(MBGDIR)/$(REFNAME)_001_1_A: $(TABLE2_1) $(TABLEDIR)/$(REFNAME)_db
 		    genes=`echo $$line | awk '{print $$4}'`; \
 		    sub=`echo $$line | awk '{print $$5}'`; \
 		    python $(MULTIGENEBLAST) \
-		        -db $(TABLEDIR)/$(REFNAME)_db \
+		        -db $(OUTPUTDIR)/$(REFNAME)_db \
 		        -in ${TABLEDIR}/${REFNAME}_$${n}.gbk \
 			-hitspergene 50 -minseqcov 80 -minpercid 50 \
 			-genes $${genes} \

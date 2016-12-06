@@ -12,7 +12,7 @@ find ../antiSMASH_input -maxdepth 1 -mindepth 1 -type d -exec sh -c "fc=\$(find 
  | wc -l); echo \"\$fc\t{}\"" \; | sort -nr | cut -d / -f3 > genome_list.txt
 
 #before executing BioCompass, we need to rename all gbk files at the inputs 
-#in order to insert their cluster number in the accession field
+in order to insert their cluster number in the accession field
 for i in `cat genome_list.txt`; do
 	genome=$i
 	gbk_list=`ls $rootpath/antiSMASH_input/$genome/*cluster*.gbk | xargs -n1 basename | cat`
@@ -21,17 +21,19 @@ for i in `cat genome_list.txt`; do
 	done
 done
 
-#now, we can execute BioCompass for each input, consisting of X steps
+#now, we can execute BioCompass for each input, using the following loop
 for i in `cat genome_list.txt`; do
 	genome=$i
 	gbk_list=`ls $rootpath/antiSMASH_input/$genome/*cluster*.gbk | xargs -n1 basename | cat`
 	cp $rootpath/antiSMASH_input/**/*cluster*.gbk $my_db
 	if [ ! -d $rootpath/merged_results ]; then mkdir -p $rootpath/merged_results; fi
-	# python check_missing_clusters.py $genome `find $rootpath/antiSMASH_input/$genome/clusterblast -iname 'cluster*txt'` \
-	# 	$rootpath/merged_results/merged_edges_best_itineration.txt
-	# cluster_list=`cat missing_cluster.txt`
+	python check_missing_clusters.py $genome $rootpath/antiSMASH_input/$genome \
+		$rootpath/merged_results/
+	tail -n +2 missing_cluster.txt > missing_cluster.txt.tmp && mv missing_cluster.txt.tmp missing_cluster.txt
 	make INPUTDIR='/Users/Tiago/Desktop/BioCompass/antiSMASH_input' REFNAME=$genome \
-		MULTIGENEBLASTDIR='/Users/Tiago/Desktop/BioCompass/multigeneblast' CUSTOMDB=$my_db TESTING=1 PART1
+		MULTIGENEBLASTDIR='/Users/Tiago/Desktop/BioCompass/multigeneblast' CUSTOMDB=$my_db \
+		EXCEPTION_LIST='/Users/Tiago/Desktop/BioCompass/BioCompass/missing_cluster.txt' PART1
+		# TESTING=1 PART1
 	for j in $gbk_list; do
 		rm $rootpath/outputs/database_clusters/$j
 	done
@@ -40,10 +42,12 @@ for i in `cat genome_list.txt`; do
 	if [ ! -d $rootpath/merged_results/corrupted_files ]; then mkdir -p $rootpath/merged_results/corrupted_files; \
 	    mv $corrupted $rootpath/merged_results/corrupted_files ; else mv $corrupted $rootpath/merged_results/corrupted_files; fi
 	make INPUTDIR='/Users/Tiago/Desktop/BioCompass/antiSMASH_input' REFNAME=$genome \
-		MULTIGENEBLASTDIR='/Users/Tiago/Desktop/BioCompass/multigeneblast' CUSTOMDB=$my_db TESTING=1 ALL
-	if [ ! -s $rootpath/merged_results/merged_edges_best_itineration.txt ]; then \
-		cat $rootpath/outputs/mgb_result/*_edges_best_itineration.txt > $rootpath/merged_results/merged_edges_best_itineration.txt;
-	else tail -n +2 $rootpath/outputs/mgb_result/*_edges_best_itineration.txt >> $rootpath/merged_results/merged_edges_best_itineration.txt; fi
+		MULTIGENEBLASTDIR='/Users/Tiago/Desktop/BioCompass/multigeneblast' CUSTOMDB=$my_db \
+		EXCEPTION_LIST='/Users/Tiago/Desktop/BioCompass/BioCompass/missing_cluster.txt' ALL
+		# TESTING=1 ALL
+	[ -f $rootpath/merged_results/merged_edges_best_itineration.txt ] && tail -n +2 \
+		$rootpath/outputs/mgb_result/*_edges_best_itineration.txt >> $rootpath/merged_results/merged_edges_best_itineration.txt \
+		|| cat $rootpath/outputs/mgb_result/*_edges_best_itineration.txt > $rootpath/merged_results/merged_edges_best_itineration.txt
 	mv $rootpath/outputs $rootpath/outputs_$genome
 	cp $rootpath/outputs_$genome/database_clusters/*.gbk $my_db
 done

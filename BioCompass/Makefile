@@ -115,7 +115,7 @@ step_G:
 	    if [ ! -f $(REFNAME)_edges_all_itineration.txt ]; \
 	        then \
 		    python $(SRC)/edges_gen.py $(REFNAME)_$${n} 1; \
-		    mv $(REFNAME)_001_edges_1.txt $(REFNAME)_edges_all_itineration.txt; \
+		    mv $(REFNAME)_$${n}_edges_1.txt $(REFNAME)_edges_all_itineration.txt; \
 		    ls $(TABLEDIR)/$(REFNAME)_$${n}_table2_*.csv | cat > itineration.txt; \
 		    iti=`cat itineration.txt | wc -l`; \
 		    for j in $$(seq 2 $$iti); \

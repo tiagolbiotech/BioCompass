@@ -29,6 +29,14 @@ for i in `cat genome_list.txt`; do
 	if [ ! -d $rootpath/merged_results ]; then mkdir -p $rootpath/merged_results; fi
 	python check_missing_clusters.py $genome $rootpath/antiSMASH_input/$genome \
 		$rootpath/merged_results/
+	if [ -s $rootpath/BioCompass/exclude_list.txt ]; then \
+		while IFS= read -r line; \
+		    do case "$line" in 'cluster'*) continue ;; esac; \
+			mkdir -p $rootpath/antiSMASH_input/$genome/excluded
+			mv `echo $line | awk '{print $1}'` $rootpath/antiSMASH_input/$genome/excluded
+			mv `echo $line | awk '{print $2}'` $rootpath/antiSMASH_input/$genome/excluded
+	        done < $rootpath/BioCompass/exclude_list.txt;
+	fi
 	make INPUTDIR='/Users/Tiago/Desktop/BioCompass/antiSMASH_input' REFNAME=$genome \
 		MULTIGENEBLASTDIR='/Users/Tiago/Desktop/BioCompass/multigeneblast' CUSTOMDB=$my_db \
 		TESTING=1 PART1
@@ -48,7 +56,6 @@ for i in `cat genome_list.txt`; do
 		$rootpath/outputs/mgb_result/*_edges_best_itineration.txt >> $rootpath/merged_results/merged_edges_best_itineration.txt \
 		|| cat $rootpath/outputs/mgb_result/*_edges_best_itineration.txt > $rootpath/merged_results/merged_edges_best_itineration.txt
 	mv $rootpath/outputs $rootpath/outputs_$genome
+	rm $rootpath/BioCompass/exclude_list.txt
 	cp $rootpath/outputs_$genome/database_clusters/*.gbk $my_db
 done
-
-

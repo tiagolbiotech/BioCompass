@@ -24,11 +24,6 @@ CUSTOMDB=$(ROOT)/my_database_clusters
 GBK_INPUT_LIST=$(shell ls $(INPUTDIR)/$(REFNAME)/*cluster*.gbk)
 CLUSTER_LIST=$(shell find  $(INPUTDIR)/$(REFNAME)/clusterblast -iname 'cluster*txt')
 
-ifdef EXCEPTION_LIST
-    GBK_INPUT_LIST=$(shell cat $(EXCEPTION_LIST) | cut -f2)
-    CLUSTER_LIST=$(shell cat $(EXCEPTION_LIST) | cut -f1)
-endif
-
 ifdef TESTING
     ifeq ($(TESTING),1)
         GBK_INPUT_LIST=$(shell ls $(INPUTDIR)/$(REFNAME)/*cluster*.gbk | head -n 2)

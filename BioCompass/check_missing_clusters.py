@@ -39,7 +39,7 @@ if os.path.isfile(filename):
                     col2.append(m.group(0))
     frames = {'cluster':col1,'gbk':col2}
     output_df = pd.DataFrame(frames, index=None)
-    output_handle = open('excluce_list.txt', "w")
+    output_handle = open('exclude_list.txt', "w")
     output_df.to_csv(output_handle, sep='\t', index=False)
     output_handle.close()
 

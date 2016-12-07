@@ -31,30 +31,16 @@ if os.path.isfile(filename):
         cluster_num = re.search(r'(.*)cluster(\d*).txt',item).group(2)
         cluster_num = '{0}'.format('%s'%cluster_num.zfill(3))
         cluster_name = '%s_%s'%(genome,cluster_num)
-        if cluster_name not in hits_list:
+        if cluster_name in hits_list:
             col1.append(item)
             for gbk in gbk_list:
                 m = re.search(r'(.*).cluster%s.gbk'%cluster_num,gbk)
                 if m:
                     col2.append(m.group(0))
-else:
-    col1 = []
-    col2 = []
-    for item in cluster_list:
-        cluster_num = re.search(r'(.*)cluster(\d*).txt',item).group(2)
-        cluster_num = '{0}'.format('%s'%cluster_num.zfill(3))
-        cluster_name = '%s_%s'%(genome,cluster_num)
-        col1.append(item)
-        for gbk in gbk_list:
-            m = re.search(r'(.*).cluster%s.gbk'%cluster_num,gbk)
-            if m:
-                col2.append(m.group(0))
+    frames = {'cluster':col1,'gbk':col2}
+    output_df = pd.DataFrame(frames, index=None)
+    output_handle = open('excluce_list.txt', "w")
+    output_df.to_csv(output_handle, sep='\t', index=False)
+    output_handle.close()
 
 
-frames = {'cluster':col1,'gbk':col2}
-
-output_df = pd.DataFrame(frames, index=None)
-
-output_handle = open('missing_cluster.txt', "w")
-output_df.to_csv(output_handle, sep='\t', index=False)
-output_handle.close()

@@ -37,8 +37,10 @@ for i in `cat genome_list.txt`; do
 	done
 	corrupted=`find $rootpath/outputs/database_clusters -type f -print | \
 		xargs grep "^\?\n\?$" | sort -u | awk -F':' '{print $1}'`
-	if [ ! -d $rootpath/merged_results/corrupted_files ]; then mkdir -p $rootpath/merged_results/corrupted_files; \
-	    mv $corrupted $rootpath/merged_results/corrupted_files ; else mv $corrupted $rootpath/merged_results/corrupted_files; fi
+	if [ -z $corrupted ]; then
+		if [ ! -d $rootpath/merged_results/corrupted_files ]; then mkdir -p $rootpath/merged_results/corrupted_files; \
+		    mv $corrupted $rootpath/merged_results/corrupted_files ; else mv $corrupted $rootpath/merged_results/corrupted_files; fi
+	fi
 	make INPUTDIR='/Users/Tiago/Desktop/BioCompass/antiSMASH_input' REFNAME=$genome \
 		MULTIGENEBLASTDIR='/Users/Tiago/Desktop/BioCompass/multigeneblast' CUSTOMDB=$my_db \
 		TESTING=1 ALL

@@ -15,6 +15,10 @@ table1_df['product'].fillna('None', inplace=True)
 #This first portion will create the distance matrix
 
 def score_match(table, index_gene1, index_gene2):
+    """ Calculates the score between two genes
+
+        This function generates a score for the comparison between 'n' and 'n+x'
+    """
     score = 0
     gene1_category = table1_df.category.loc[index_gene1]
     gene2_category = table1_df.category.loc[index_gene2]
@@ -44,6 +48,13 @@ def score_match(table, index_gene1, index_gene2):
         score = score + 1
     return score
 
+""" Creates a matrix A (array) comparing every gene to every other gene in the cluster
+
+    This loop uses score_match() to loop over the gene cluster, comparing every gene 'n' to all other
+    genes in the cluster. Then, moves to gene 'n+1' and repeats the process. Therefore, the output is
+    a symetric matrix (arrays) of all vs all genes from the cluster
+"""
+
 for index,row in table1_df.iterrows():
     scores = []
     for gene in range(0,len(table1_df)):
@@ -56,6 +67,11 @@ for index,row in table1_df.iterrows():
 #This second portion will run dbscan to create a subclusters possibilities
 
 def repeated(db_arrays,db):
+    """ Check if a new iteration (different eps value) produce a previously observe DBSCAN result
+
+        This function analyze if a new DBSCAN iteration was already reported, if so, it's ignored and
+        the script should move on
+    """
     for i in range(0,len(db_arrays)-1):
         if np.array_equal(db_arrays[i],db) == False:
             continue
@@ -64,6 +80,13 @@ def repeated(db_arrays,db):
             break
 
 def parse_db(db):
+    """ This function creates a dictionary to attribute indexes for the DBSCAN result
+
+        Since the DBSCAN output only contains the information saying if that the gene 'n' should belong
+        to group '0' and gene 'n+1' should be group '-1' and so on. This function creates a dictionary
+        with this grouping (keys) and the gene indexes (values), so in the next step we can correlate those
+        with the data for each gene
+    """
     D = defaultdict(list)
     for i,item in enumerate(db):
         D[item].append(i)
@@ -71,6 +94,12 @@ def parse_db(db):
     return D
 
 def find_category(categories,col5):
+    """ This function decides which category the subcluster should have, based on its genes
+
+        Since genes in the subcluster can have different categories, the subcluster should be tagged with
+        the most abundant category. The only exception is if exists a gene with category 'biosynthetic' and
+        this category is not the most abundant, calling the subcluster 'biosynthetic' anyways
+    """
     if 'biosynthetic' in categories:
         col5.append('biosynthetic')
     else:
@@ -79,6 +108,10 @@ def find_category(categories,col5):
             col5.append('%s'%category)
         else:
             col5.append('%s'%categories[0])
+
+""" this last loop integrates all functions, creating table2_df
+"""
+
     
 count = 0
     

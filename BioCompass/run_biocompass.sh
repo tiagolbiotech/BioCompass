@@ -29,17 +29,17 @@ for i in `cat genome_list.txt`; do
 	if [ ! -d $rootpath/merged_results ]; then mkdir -p $rootpath/merged_results; fi
 	python check_missing_clusters.py $genome $rootpath/antiSMASH_input/$genome \
 		$rootpath/merged_results/
-	### ao inves de mv, renomeia a extensao para .txt.no e .gbk.no
-	# if [ -s $rootpath/BioCompass/exclude_list.txt ]; then \
-	# 	while IFS= read -r line; \
-	# 	    do case "$line" in 'cluster'*) continue ;; esac; \
-	# 		mkdir -p $rootpath/antiSMASH_input/$genome/excluded
-	# 		mv `echo $line | awk '{print $1}'` $rootpath/antiSMASH_input/$genome/excluded
-	# 		mv `echo $line | awk '{print $2}'` $rootpath/antiSMASH_input/$genome/excluded
-	#         done < $rootpath/BioCompass/exclude_list.txt;
-	# fi
+	if [ -s $rootpath/BioCompass/exclude_list.txt ]; then \
+		while IFS= read -r line; \
+		    do case "$line" in 'cluster'*) continue ;; esac; \
+			file1=`echo $line | awk '{print $1}'`
+			mv $file1 $file1.no
+			file2=`echo $line | awk '{print $2}'`
+			mv $file2 $file2.no
+	        done < $rootpath/BioCompass/exclude_list.txt;
+	fi
 	make INPUTDIR='/Users/Tiago/Desktop/BioCompass/antiSMASH_input' REFNAME=$genome \
-		MULTIGENEBLASTDIR='/Users/Tiago/Desktop/BioCompass/multigeneblast' CUSTOMDB=$my_db PART1
+		MULTIGENEBLASTDIR='/Users/Tiago/Desktop/BioCompass/multigeneblast' CUSTOMDB=$my_db TESTING=1 PART1
 	for j in $gbk_list; do
 		rm $rootpath/outputs/database_clusters/$j
 	done
@@ -48,11 +48,15 @@ for i in `cat genome_list.txt`; do
 	if [ ! -d $rootpath/merged_results/corrupted_files ]; then mkdir -p $rootpath/merged_results/corrupted_files; \
 	    mv $corrupted $rootpath/merged_results/corrupted_files ; else mv $corrupted $rootpath/merged_results/corrupted_files; fi
 	make INPUTDIR='/Users/Tiago/Desktop/BioCompass/antiSMASH_input' REFNAME=$genome \
-		MULTIGENEBLASTDIR='/Users/Tiago/Desktop/BioCompass/multigeneblast' CUSTOMDB=$my_db ALL
+		MULTIGENEBLASTDIR='/Users/Tiago/Desktop/BioCompass/multigeneblast' CUSTOMDB=$my_db TESTING=1 ALL
 	[ -f $rootpath/merged_results/merged_edges_best_itineration.txt ] && tail -n +2 \
 		$rootpath/outputs/mgb_result/*_edges_best_itineration.txt >> $rootpath/merged_results/merged_edges_best_itineration.txt \
 		|| cat $rootpath/outputs/mgb_result/*_edges_best_itineration.txt > $rootpath/merged_results/merged_edges_best_itineration.txt
 	mv $rootpath/outputs $rootpath/outputs_$genome
-	rm $rootpath/BioCompass/exclude_list.txt
-	cp $rootpath/outputs_$genome/database_clusters/*.gbk $my_db
+	mv $rootpath/outputs_$genome/database_clusters/*.gbk $my_db
+	rm -r $rootpath/outputs_$genome/database_clusters/
 done
+
+
+
+

@@ -63,8 +63,8 @@ $(ClustersDatabase)/MIBiG:
 
 $(ClustersDatabase)/CUSTOMDB: $(ClustersDatabase)/MIBiG
 	if [ -d $(CUSTOMDB) ]; then \
-	cp $(CUSTOMDB)/*.gbk $(ClustersDatabase); \
-	fi
+	ls -R $(CUSTOMDB) | xargs -I file cp $(CUSTOMDB)/file $(ClustersDatabase) ;\
+	fi;
 
 $(ClustersDatabase): $(ClustersDatabase)/CUSTOMDB
 	mkdir -p $@

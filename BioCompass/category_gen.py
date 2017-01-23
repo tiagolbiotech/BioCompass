@@ -23,7 +23,7 @@ table1_df['product'] = table1_df['product'].astype(str)
 
 for line in table1_df['product']:
     for key in subcluster_dict:
-        m = re.search(key, line, re.I)
+        m = re.search(r'%s:(.*)'%key, line)
         if line != None and m != None:
             col7.append(subcluster_dict[key])
             col8.append(line)

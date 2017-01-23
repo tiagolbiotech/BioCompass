@@ -19,6 +19,7 @@ MAKEDB=$(MULTIGENEBLASTDIR)/makedb.py
 MULTIGENEBLAST=$(MULTIGENEBLASTDIR)/multigeneblast.py
 
 ClustersDatabase=$(OUTPUTDIR)/database_clusters
+CUSTOMDB=$(ROOT)/my_database_clusters
 
 GBK_INPUT_LIST=$(shell ls $(INPUTDIR)/$(REFNAME)/*cluster*.gbk)
 CLUSTER_LIST=$(shell find  $(INPUTDIR)/$(REFNAME)/clusterblast -iname 'cluster*txt')
@@ -57,7 +58,12 @@ $(ClustersDatabase)/MIBiG:
 	mkdir -p $@
 	BioCompass download-MIBiG --outputdir $@
 
-$(ClustersDatabase): $(ClustersDatabase)/MIBiG
+$(ClustersDatabase)/CUSTOMDB: $(ClustersDatabase)/MIBiG
+	if [ -d $(CUSTOMDB) ]; then \
+	ls -R $(CUSTOMDB) | xargs -I file cp $(CUSTOMDB)/file $(ClustersDatabase) ;\
+	fi;
+
+$(ClustersDatabase): $(ClustersDatabase)/CUSTOMDB
 	mkdir -p $@
 	for file in $(CLUSTER_LIST); \
 		do BioCompass download-hits --outputdir $@ $$file; \

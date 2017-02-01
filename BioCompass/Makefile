@@ -79,15 +79,11 @@ $(TABLEDIR)/$(REFNAME)_db: $(ClustersDatabase)
 
 
 $(MBGDIR)/$(REFNAME)_001_1_A: $(TABLE2_1) $(TABLEDIR)/$(REFNAME)_db
-
 	mkdir -p $(MBGDIR)
 
-	# cp $(TABLEDIR)/$(REFNAME)_db* $(MULTIGENEBLASTDIR)/
-
 	cd $(MULTIGENEBLASTDIR); \
-	num=`echo $(GBK_INPUT_LIST) | wc -w`; \
-	for i in $$(seq 1 $$num); \
-	    do n=`printf "%03d\n" $$i`; \
+	for file in $(GBK_INPUT_LIST); \
+	    do n=`echo $$file |  sed -e 's/.*cluster\(.*\)\.gbk/\1/'`; \
 	    echo $$n; \
 	    nclusters=`ls ${TABLEDIR}/${REFNAME}_$${n}_table2_*.csv  | wc -l`; \
 	    echo "nclusters: "$${nclusters}; \
@@ -110,17 +106,15 @@ $(MBGDIR)/$(REFNAME)_001_1_A: $(TABLE2_1) $(TABLEDIR)/$(REFNAME)_db
 
 
 step_G:
-
 	mkdir -p $(MBGDIR)
 
 	cd $(MBGDIR); \
-	num=`echo $(GBK_INPUT_LIST) | wc -w`; \
-	for i in $$(seq 1 $$num); \
-	    do n=`printf "%03d\n" $$i`; \
-	    if [ $$i -eq 1 ]; \
+	for file in $(GBK_INPUT_LIST); \
+	    do n=`echo $$file |  sed -e 's/.*cluster\(.*\)\.gbk/\1/'`; \
+	    if [ ! -f $(REFNAME)_edges_all_itineration.txt ]; \
 	        then \
 		    python $(SRC)/edges_gen.py $(REFNAME)_$${n} 1; \
-		    mv $(REFNAME)_001_edges_1.txt $(REFNAME)_edges_all_itineration.txt; \
+		    mv $(REFNAME)_$${n}_edges_1.txt $(REFNAME)_edges_all_itineration.txt; \
 		    ls $(TABLEDIR)/$(REFNAME)_$${n}_table2_*.csv | cat > itineration.txt; \
 		    iti=`cat itineration.txt | wc -l`; \
 		    for j in $$(seq 2 $$iti); \

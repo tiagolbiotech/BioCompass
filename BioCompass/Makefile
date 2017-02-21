@@ -62,6 +62,7 @@ $(ClustersDatabase)/CUSTOMDB: $(ClustersDatabase)/MIBiG
 	if [ -d $(CUSTOMDB) ]; then \
 	ls -R $(CUSTOMDB) | xargs -I file cp $(CUSTOMDB)/file $(ClustersDatabase) ;\
 	fi;
+	mv $(ClustersDatabase)/MIBiG/*.gbk $(ClustersDatabase)/
 
 $(ClustersDatabase): $(ClustersDatabase)/CUSTOMDB
 	mkdir -p $@
@@ -148,12 +149,13 @@ step_H: step_G
 	# 	python $(SRC)/filter_edges.py $(REFNAME)
 
 	cd $(MBGDIR); \
-		python $(SRC)/feature_gen.py $(REFNAME) $(REFNAME)_edges_best_itineration.txt
+		# python $(SRC)/feature_gen.py $(REFNAME) $(REFNAME)_edges_best_itineration.txt
 
 	# mv ./$1_table3.csv ../../outputs/tables/
-	mv $(MBGDIR)/$(REFNAME)_features.txt $(OUTPUTDIR)
+	# mv $(MBGDIR)/$(REFNAME)_features.txt $(OUTPUTDIR)
 	mv $(MBGDIR)/$(REFNAME)_edges_all_itineration.txt $(OUTPUTDIR)
 	mv $(MBGDIR)/$(REFNAME)_edges_best_itineration.txt $(OUTPUTDIR)
+	mv $(MBGDIR)/$(REFNAME)_table3.csv $(OUTPUTDIR)
 	# mv $(MBGDIR)/$(REFNAME)_edges_filtered.txt $(OUTPUTDIR)
 
 #legacy:
